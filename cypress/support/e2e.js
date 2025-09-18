@@ -1,5 +1,1 @@
-// / <reference types="cypress" />
-
-import './commands.js'
-
-export {}
+import './commands.js';

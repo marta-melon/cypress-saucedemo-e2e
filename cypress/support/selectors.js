@@ -8,8 +8,8 @@ export const Sel = {
   inventory: {
     item: '.inventory_item',
     sort: '[data-test="product_sort_container"]',
-    addToCart: (name: string) => `button[data-test="add-to-cart-${name}"]`,
-    removeFromCart: (name: string) => `button[data-test="remove-${name}"]`,
+    addToCart: (name) => `button[data-test="add-to-cart-${name}"]`,
+    removeFromCart: (name) => `button[data-test="remove-${name}"]`,
     cartIcon: '.shopping_cart_link'
   },
   cart: {
