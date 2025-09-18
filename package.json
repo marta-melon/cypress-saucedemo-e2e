@@ -14,15 +14,12 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "ajv": "^8.12.0",
-    "ajv-formats": "^3.0.1",
     "cypress": "^13.9.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-cypress": "^2.15.2",
     "husky": "^9.0.11",
     "prettier": "^3.3.3",
-    "cypress-axe": "^1.5.0",
-    "cypress-grep": "^4.0.0"
+    "cypress-axe": "^1.5.0"
   }
 }

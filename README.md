@@ -13,7 +13,7 @@ This project tests the demo web app **saucedemo.com** with Cypress 13 and JavaSc
 
 ## Install
 ```bash
-npm ci
+npm install
 npx cypress verify
 ```
 ...

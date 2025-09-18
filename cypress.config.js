@@ -5,7 +5,6 @@ export default defineConfig({
     baseUrl: 'https://www.saucedemo.com',
     supportFile: 'cypress/support/e2e.js',
     setupNodeEvents(on, config) {
-      // place for reporters / tasks if needed
       return config
     },
   },
