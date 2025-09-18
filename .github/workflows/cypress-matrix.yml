@@ -1,0 +1,49 @@
+name: cypress-matrix
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [electron, chrome]
+        index: [1]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Cypress
+        run: npx cypress verify
+
+      - name: Run Cypress
+        env:
+          BROWSER: ${{ matrix.browser }}
+        run: |
+          npx cypress run --headless --browser "$BROWSER"             --reporter junit --reporter-options "mochaFile=results/junit-[hash].xml,toConsole=true"
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-${{ matrix.browser }}-shard-${{ matrix.index }}
+          path: |
+            cypress/screenshots
+            cypress/videos
+            results
+          if-no-files-found: ignore

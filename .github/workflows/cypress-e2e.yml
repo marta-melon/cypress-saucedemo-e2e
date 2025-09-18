@@ -1,0 +1,42 @@
+name: cypress-e2e
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Cypress
+        run: npx cypress verify
+
+      - name: Run Cypress (Electron headless)
+        run: |
+          npx cypress run --headless --browser electron --spec "cypress/e2e/**/*.cy.js"             --reporter junit --reporter-options "mochaFile=results/junit-[hash].xml,toConsole=true"
+
+      - name: Upload artifacts (screenshots/videos/results)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-artifacts
+          path: |
+            cypress/screenshots
+            cypress/videos
+            results
+          if-no-files-found: ignore

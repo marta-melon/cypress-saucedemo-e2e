@@ -1,0 +1,28 @@
+{
+  "name": "cypress-saucedemo-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "husky install || true",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test": "cypress run --headless --browser electron --spec 'cypress/e2e/**/*.cy.js'",
+    "test:gui": "cypress open",
+    "test:ci": "cypress run --browser chrome --headless --reporter junit --reporter-options mochaFile=results/junit-[hash].xml --record false",
+    "lint": "eslint . --ext .ts,.tsx,.js",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.1",
+    "cypress": "^13.9.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-cypress": "^2.15.2",
+    "husky": "^9.0.11",
+    "prettier": "^3.3.3",
+    "cypress-axe": "^1.5.0",
+    "cypress-grep": "^4.0.0"
+  }
+}
