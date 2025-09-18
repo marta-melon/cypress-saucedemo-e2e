@@ -25,7 +25,7 @@ Cypress.Commands.add('addItem', (slug) => {
   cy.get(Sel.inventory.removeFromCart(slug)).should('be.visible');
 });
 
-Cypress.Commands.add('checkout', (data: { firstName; lastName; postalCode }) => {
+Cypress.Commands.add('checkout', (data) => {
   cy.get(Sel.cart.checkout).click();
   cy.get(Sel.checkout.firstName).type(data.firstName);
   cy.get(Sel.checkout.lastName).type(data.lastName);
