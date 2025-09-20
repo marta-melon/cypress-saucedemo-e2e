@@ -1,3 +1,5 @@
+// Safe optional load for cypress-image-snapshot
+try { require('cypress-image-snapshot/command') } catch(e) { console.warn('cypress-image-snapshot not loaded:', e?.message || e) }
 import 'cypress-axe';
 import { Sel } from './selectors.js';
 
@@ -34,15 +36,8 @@ Cypress.Commands.add('checkout', (data) => {
   cy.get(Sel.checkout.finish).click();
 });
 
-// Visual testing (cypress-image-snapshot)
-try {
-  const { addMatchImageSnapshotCommand } = require('cypress-image-snapshot/command');
-  addMatchImageSnapshotCommand({
-    failureThreshold: Cypress.env('visualThreshold') || 0.02,
-    failureThresholdType: 'percent'
-  });
-} catch (e) {
-  // Plugin not installed – tests that call cy.matchImageSnapshot will fail;
-  // keep CI green by providing a no-op fallback.
-  Cypress.Commands.add('matchImageSnapshot', () => {});
-}
+import { addMatchImageSnapshotCommand } from '@simonsmith/cypress-image-snapshot/command';
+addMatchImageSnapshotCommand({
+  failureThreshold: Cypress.env('visualThreshold') || 0.02,
+  failureThresholdType: 'percent'
+});
