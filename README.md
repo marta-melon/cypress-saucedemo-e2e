@@ -1,33 +1,24 @@
-# Cypress Saucedemo E2E Tests
+# cypress-restful-booker-api (fixed)
 
-This project tests the demo web app **saucedemo.com** with Cypress 13 and JavaScript.
+Stable Cypress project for testing the **Restful Booker** API.
 
-## Tests
-- `auth-login.cy.js` – login variations
-- `auth-logout.cy.js` – menu logout
-- `catalog-sorting.cy.js` – sort and filter inventory
-- `checkout-happy-path.cy.js` – full checkout flow
-- `checkout-validation.cy.js` – form validation
-- `quality-a11y.cy.js` – basic WCAG checks
-- `quality-visual.cy.js` – snapshot smoke
-
-## Install
+## Run locally
 ```bash
-npm install
-npx cypress verify
-```
-...
-Headless:
-```bash
+npm ci
 npm test
 ```
 
-## CI
-GitHub Actions runs tests on Ubuntu. It uses matrix (Electron + Chrome) and shards.
-
-Flow:
-```
-push -> matrix -> shard -> run -> artifacts
+### Base URL
+Defaults to `https://restful-booker.herokuapp.com`. Override with:
+```bash
+BOOKER_BASE_URL=http://localhost:3001 npm test
 ```
 
-JUnit XML is saved to `results/`. Visual baselines live under `cypress/snapshots`. A11y uses `cypress-axe`.
+## Specs
+- `auth.cy.js` – token creation sanity
+- `bookings-crud.cy.js` – create/read/update/delete booking
+- `bookings-negative.cy.js` – negative flows
+- `security-sanity.cy.js` – simple headers checks
+- `sla-metrics.cy.js` – response-time smoke
+
+All specs use plain `cy.request()` and CommonJS config to avoid Webpack/ESM bundling issues seen in CI.

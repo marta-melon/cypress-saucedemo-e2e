@@ -1,20 +1,18 @@
-// Safe optional load for cypress-image-snapshot
-try { require('cypress-image-snapshot/command') } catch(e) { console.warn('cypress-image-snapshot not loaded:', e?.message || e) }
-import { defineConfig } from 'cypress'
-import { addMatchImageSnapshotPlugin } from '@simonsmith/cypress-image-snapshot/plugin'
+const { defineConfig } = require('cypress');
 
-export default defineConfig({
+module.exports = defineConfig({
   e2e: {
-    baseUrl: 'https://www.saucedemo.com',
+    baseUrl: process.env.BOOKER_BASE_URL || 'https://restful-booker.herokuapp.com',
+    specPattern: 'cypress/e2e/**/*.cy.js',
     supportFile: 'cypress/support/e2e.js',
     setupNodeEvents(on, config) {
-      addMatchImageSnapshotPlugin(on)
-      return config
+      // implement node event listeners here if needed
+      return config;
     },
   },
-  reporter: 'junit',
-  reporterOptions: {
-    mochaFile: 'results/junit-[hash].xml',
-    toConsole: true,
-  },
-})
+  video: false,
+  screenshotsFolder: 'cypress/screenshots',
+  fixturesFolder: 'cypress/fixtures',
+  defaultCommandTimeout: 8000,
+  requestTimeout: 15000,
+});

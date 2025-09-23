@@ -1,5 +1,3 @@
-// Safe optional load for cypress-image-snapshot
-try { require('cypress-image-snapshot/command') } catch(e) { console.warn('cypress-image-snapshot not loaded:', e?.message || e) }
 import 'cypress-axe';
 import { Sel } from './selectors.js';
 
