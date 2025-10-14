@@ -1,17 +1,12 @@
 {
-  "name": "cypress-restful-booker-api",
-  "version": "1.0.0",
+  "name": "cypress-e2e-saucedemo",
   "private": true,
-  "description": "Cypress E2E/API tests for Restful Booker with stable bundling and CI config.",
+  "version": "1.0.0",
   "scripts": {
-    "cy:open": "cypress open",
-    "test": "cypress run",
-    "lint": "echo \"No lint configured\""
+    "open": "cypress open",
+    "test": "cypress run --headless --browser electron --reporter junit --reporter-options mochaFile=results/junit-[hash].xml,toConsole=true"
   },
   "devDependencies": {
-    "@simonsmith/cypress-image-snapshot": "10.0.2",
-    "axe-core": "^4.10.0",
-    "cypress": "13.17.0",
-    "cypress-axe": "^1.5.0"
+    "cypress-axe": "^1.7.0"
   }
 }
