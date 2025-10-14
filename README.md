@@ -1,44 +1,84 @@
 # Cypress E2E – SauceDemo
 
-Production‑ready Cypress project that exercises the **SauceDemo** storefront end‑to‑end: authentication, product catalog, cart, checkout and regression quality gates (a11y, visual, basic security, SLA probes).
+Production‑ready Cypress project for the **SauceDemo** storefront: authentication, product catalog, cart, checkout, and quality gates (a11y smoke, visual placeholder).
 
-## Highlights
-- **Realistic user flows**: login/logout, sort & filter catalog, add/remove items, checkout (validations & happy path).
-- **Quality gates**: axe‑core accessibility checks, lightweight visual checks, negative scenarios and security sanity.
-- **Operational signals**: simple **SLA probes** for key endpoints to spot regressions over time.
-- **Stable runs**: no fixed sleeps, idempotent data, retries enabled, selectors isolated in `/support`.
+## Stack
+- **Cypress 13.x**
+- **Node 20.x**
+- **cypress-axe** (a11y)
+- GitHub Actions matrix: **electron**, **chrome**
+
+## Getting started
+```bash
+npm ci           # install dependencies
+npm test         # headless run (electron) + JUnit report
+npm run open     # open Cypress runner (interactive)
+```
+
+### Credentials
+Default credentials used by tests:
+- `standard_user` / `secret_sauce`
+- Negative case: `locked_out_user` / `secret_sauce`
+
+You can override via env:
+- locally: `cypress.env.json`
+```json
+{ "USER_NAME": "standard_user", "USER_PASS": "secret_sauce" }
+```
+- in CI (optional): GitHub Secrets `CYPRESS_USER_NAME`, `CYPRESS_USER_PASS`
+
+The `cy.login` helper falls back to the defaults above, so CI works even without secrets.
 
 ## Project structure
 ```
 cypress/
-  e2e/                 # spec files (auth, catalog, checkout, quality, security, sla)
-  fixtures/            # users, test data
-  support/             # commands, selectors, hooks
-cypress.config.js
-package.json
+  e2e/
+    accessibility-smoke.cy.js
+    auth-login.cy.js
+    auth-logout.cy.js
+    catalog-sorting.cy.js
+    checkout-happy-path.cy.js
+    checkout-validation.cy.js
+    quality-a11y.cy.js
+    quality-visual.cy.js     # placeholder/pending
+    saucedemo-auth.cy.js
+    saucedemo-cart-checkout.cy.js
+  support/
+    e2e.js        # imports cypress-axe + ./commands
+    commands.js   # cy.login, cy.logout, cy.ensureOnInventory, cy.openCart, cy.addAnyItem
+.github/workflows/
+  cypress-matrix.yml
 ```
-Key specs: `auth-login.cy.js`, `auth-logout.cy.js`, `catalog-sorting.cy.js`, `checkout-happy-path.cy.js`, `checkout-validation.cy.js`, `quality-a11y.cy.js`, `quality-visual.cy.js`, `security-sanity.cy.js`, `sla-metrics.cy.js`.
 
-## Getting started
-```bash
-npm ci
-npm test            # run headless
-npm run open        # interactive runner
+## Scripts
+```json
+{
+  "scripts": {
+    "open": "cypress open",
+    "test": "cypress run --headless --browser electron --reporter junit --reporter-options mochaFile=results/junit-[hash].xml,toConsole=true"
+  },
+  "devDependencies": {
+    "cypress-axe": "^1.5.0"
+  }
+}
 ```
 
-### Config & environments
-- Base URL set in `cypress.config.js` (SauceDemo). Override with `CYPRESS_baseUrl=https://… npm test`.
-- Secrets (e.g. credentials) loaded from fixtures or env (`CYPRESS_…`). Avoid committing real secrets.
+## A11y policy
+- Smoke on key pages.
+- Validate **`critical`** impact only.
+- On the inventory page, disable Axe rule **`select-name`** (known false positive for the sorting `<select>`).
+- Call order: **`cy.injectAxe()` before `cy.configureAxe()`**, then `cy.checkA11y(...)`.
 
-### Running in CI
-- `npm test` for headless runs; artifacts (screenshots/videos) enabled on failure.
-- JUnit/JSON reports can be exported from Cypress results folder and uploaded to CI.
+## CI
+Workflow `.github/workflows/cypress-matrix.yml`:
+- installs deps (`npm ci`)
+- runs `npx cypress run` for `electron` and `chrome`
+- uploads JUnit XML as an artifact (`results/`)
 
-## Coding standards
-- ESLint enforced; PRs must be green.
-- Test **tags** (`@smoke`, `@auth`, `@checkout`) allow selective runs: `--env grepTags=@smoke` (with cypress-grep if configured).
+## Troubleshooting
+- **404 after `cy.visit('/inventory.html')`** → route is protected; use helpers (`cy.ensureOnInventory()`, `cy.openCart()`).
+- **Axe: TypeError with `configureAxe`** → make sure `cy.injectAxe()` is called **before** `cy.configureAxe(...)`.
+- **No secrets in forks** → helper has a fallback; tests run without secrets.
 
-## What these tests prove
-- Critical E2E path to buy a product works on every build.
-- **Guardrails** catch common regressions: broken auth/session, UI accessibility, accidental UI changes, insecure headers.
-- **SLA probe** surfaces slowdowns before they hit users.
+## License
+Demo tests for educational purposes.

@@ -1,44 +1,76 @@
-# Test Plan – SauceDemo (Cypress E2E)
+# Cypress E2E – SauceDemo • Test Plan (English)
 
-## Objective
-Verify that a user can reliably authenticate, browse, and complete checkout in SauceDemo, while guardrails (a11y, visual, security, SLA) prevent common regressions.
+## 1. Purpose & Scope
+End‑to‑end tests for the **SauceDemo** storefront (https://www.saucedemo.com). Covered flows: login/logout, product catalog, cart, checkout, and quality gates (a11y smoke, visual placeholder). The plan reflects the repository **as implemented after the fixes**.
 
-## Scope
-**In scope**
-- Auth: login (happy path), logout, invalid credentials.
-- Catalog: sorting assertions; product card presence; add/remove from cart.
-- Checkout: form validation (required fields, formats); end‑to‑end happy path to order confirmation.
-- Quality gates: accessibility (axe), visual smoke, basic security headers/content‑type, SLA probe for key pages/APIs.
+**Out of scope:** payments (demo), external integrations, browser performance tests, API tests.
 
-**Out of scope**
-- Payment processor integration; email receipts; cross‑browser matrix beyond the configured runner.
+## 2. Test Environment & Browsers
+- Environment: SauceDemo public demo.
+- CI browsers: `electron`, `chrome` (GitHub Actions matrix).
+- Node: 20.x, Cypress: 13.x.
 
-## Test design
-- **Data**: fixture users; cart state created per test, cleaned up in `afterEach` where needed.
-- **Selectors**: centralized in `support/selectors.js` to decouple from DOM changes.
-- **Resilience**: no arbitrary waits; built‑in retries (runMode=2).
+## 3. Accounts / Data
+- Default credentials: **`standard_user` / `secret_sauce`**.
+- Negative scenario: **`locked_out_user` / `secret_sauce`**.
+- Credentials can be overridden via `Cypress.env('USER_NAME')` / `Cypress.env('USER_PASS')` (fallback to the defaults above).
 
-## Non‑functional checks
-- **Accessibility**: run axe on critical pages; fail build on serious/critical violations.
-- **Visual**: compare key screens (login, inventory, cart, checkout overview) against baselines with permissive threshold.
-- **Security sanity**: assert secure headers and JSON content type on API responses used by the UI.
-- **SLA**: record response time for GET inventory/cart; p95 budget tracked in results (informational failure threshold ≥ defined budget).
+## 4. Inputs / Outputs
+- Inputs: UI navigation and interactions, `data-test` selectors.
+- Outputs: URL/text assertions and JUnit XML (in `results/`), screenshots and videos in default Cypress folders.
 
-## Environments
-- Default: production demo site.
-- Override `baseUrl` via env for staging mirrors.
+## 5. Acceptance Criteria
+- Critical user flows (login, sorting, add to cart, checkout) **pass**.
+- A11y smoke: no **critical** impact violations on the key pages.
+- CI passes for all browsers in the matrix.
 
-## Entry/Exit criteria
-- **Entry**: environment reachable; test user available.
-- **Exit**: all **critical** E2E pass; no high‑severity a11y violations; visual diffs within threshold; SLA probe within budget.
+## 6. Scenario Coverage (mapping → .cy.js files)
+### 6.1 Authentication
+- **Login (happy path)** → `auth-login.cy.js` / `saucedemo-auth.cy.js`  
+  Expected: after login, URL contains `/inventory.html`, page title “Products” is visible.
+- **Login (negative – locked_out_user)** → `auth-login.cy.js` / `saucedemo-auth.cy.js`  
+  Expected: error message containing “locked out”.
+- **Logout** → `auth-logout.cy.js`  
+  Expected: redirected back to the login page (`/`).
 
-## Reporting & triage
-- Cypress dashboard/CI artifacts (screenshots, videos). Optional JUnit for CI test summaries.
-- Failures triaged within the team; defects logged with repro steps and spec name.
+### 6.2 Catalog & Sorting
+- **Sort by Price (low to high)** → `catalog-sorting.cy.js`  
+  Expected: items sorted by ascending price.
 
-## Risks & mitigations
-- **Flaky selectors** → centralize selectors, prefer data‑test ids.
-- **Third‑party outages** → keep tests hermetic (avoid external dependencies).
+### 6.3 Cart & Purchase
+- **Checkout – happy path** → `checkout-happy-path.cy.js` and `saucedemo-cart-checkout.cy.js`  
+  Steps: add an item → open cart → checkout step one → fill details → finish.  
+  Expected: `checkout-complete.html` with “Thank you for your order!”.
+- **Checkout – validations** → `checkout-validation.cy.js`  
+  Expected: `firstName`, `lastName`, `postalCode` are required on step one.
 
-## Maintenance
-- Review baselines monthly; update selectors when UI refactors; expand negative tests around checkout as new issues appear.
+### 6.4 Quality Gates
+- **A11y smoke** → `accessibility-smoke.cy.js`, `quality-a11y.cy.js`  
+  - Scope: login, inventory, cart, checkout step one.  
+  - Axe rules: **only `critical`** impact.  
+  - **Exception:** on the inventory page, rule `select-name` is disabled (known issue on the sorting `<select>`).  
+  - Navigation via **UI** (login and clicks), no direct deep‑links to protected routes.
+- **Visuals** → `quality-visual.cy.js` (placeholder/pending baseline).
+
+## 7. Test Architecture / Helpers
+Helpers are defined in `cypress/support/commands.js` and loaded in `cypress/support/e2e.js`:
+- `cy.login(user='standard_user', pass='secret_sauce')`
+- `cy.logout()`
+- `cy.ensureOnInventory()` – ensures logged‑in state and the inventory screen
+- `cy.openCart()` – opens the cart
+- `cy.addAnyItem()` – adds the first visible product
+- A11y integration: `cypress-axe` (`cy.injectAxe`, `cy.checkA11y`, `cy.configureAxe`)
+
+## 8. Reporting & CI
+- JUnit reports (`results/junit-[hash].xml`) uploaded as a GitHub Actions artifact.
+- Workflow: `.github/workflows/cypress-matrix.yml` (electron + chrome).
+- Retries depend on Cypress config (no explicit per‑spec retries by default).
+
+## 9. Risks & Known Behaviors
+- Deep‑linking to protected routes (`/inventory.html`, `/cart.html`, `/checkout-step-one.html`) may return 404 — navigate **through the UI**.
+- A11y: `select-name` on the inventory page is disabled in the smoke. For a full audit, run all rules in a separate job.
+
+## 10. Maintenance & Next Steps
+- Consolidate duplicate specs (`auth-login` vs `saucedemo-auth`).
+- Add visual snapshots (e.g., `cypress-image-snapshot`) and per‑browser baselines.
+- Expand a11y beyond `critical` with narrow rule exceptions (after stabilizing).
