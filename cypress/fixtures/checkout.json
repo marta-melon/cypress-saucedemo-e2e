@@ -1,4 +1,0 @@
-{
-  "valid": { "firstName": "Jane", "lastName": "Doe", "postalCode": "00-001" },
-  "invalid": { "firstName": "", "lastName": "", "postalCode": "" }
-}
