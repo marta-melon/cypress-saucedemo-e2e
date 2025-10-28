@@ -7,6 +7,7 @@
     "test": "cypress run --headless --browser electron --reporter junit --reporter-options mochaFile=results/junit-[hash].xml,toConsole=true"
   },
   "devDependencies": {
+    "@simonsmith/cypress-image-snapshot": "^10.0.2",
     "cypress-axe": "^1.7.0"
   }
 }
