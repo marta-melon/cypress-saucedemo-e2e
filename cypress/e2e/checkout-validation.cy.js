@@ -1,7 +1,6 @@
 describe('Checkout validation', () => {
   beforeEach(() => {
-    cy.login('standard_user', 'secret_sauce');
-    cy.ensureOnInventory();
+cy.ensureOnInventory();
     cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
     cy.openCart();
     cy.get('[data-test="checkout"]').click();

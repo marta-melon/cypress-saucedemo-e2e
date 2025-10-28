@@ -1,7 +1,6 @@
 describe('Checkout happy path', () => {
   it('purchases a single item successfully', () => {
-    cy.login('standard_user', 'secret_sauce');
-    cy.ensureOnInventory();
+cy.ensureOnInventory();
     // Add backpack (stable selector) and go to cart
     cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
     cy.openCart();
