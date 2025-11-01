@@ -1,84 +1,101 @@
-# Cypress E2E – SauceDemo
+# Cypress E2E Framework – SauceDemo Example
 
-Production‑ready Cypress project for the **SauceDemo** storefront: authentication, product catalog, cart, checkout, and quality gates (a11y smoke, visual placeholder).
+Comprehensive **end-to-end test automation framework** built with [Cypress](https://www.cypress.io/), showcasing:
+- modular test design,
+- clean selector management,
+- accessibility and regression checks,
+- CI/CD integration with GitHub Actions.
 
-## Stack
+> This project demonstrates my approach to building maintainable, production-ready E2E suites — not just “tests that click”.
+
+---
+
+## Tech Stack
 - **Cypress 13.x**
 - **Node 20.x**
-- **cypress-axe** (a11y)
-- GitHub Actions matrix: **electron**, **chrome**
+- **cypress-axe** – accessibility testing
+- **Mocha + Chai** – assertions
+- **GitHub Actions** – CI matrix (Electron / Chrome)
+- **JUnit reporter** – machine-readable results for pipelines
 
-## Getting started
+---
+
+## Running the Tests
+
+### Local Run
 ```bash
-npm ci           # install dependencies
-npm test         # headless run (electron) + JUnit report
-npm run open     # open Cypress runner (interactive)
+npm ci          # install dependencies
+npm test        # headless run (Electron) + JUnit report
+npm run open    # open Cypress runner (interactive)
 ```
 
 ### Credentials
-Default credentials used by tests:
-- `standard_user` / `secret_sauce`
-- Negative case: `locked_out_user` / `secret_sauce`
+For security reasons, test credentials are not stored in this repository.
 
-You can override via env:
-- locally: `cypress.env.json`
-```json
-{ "USER_NAME": "standard_user", "USER_PASS": "secret_sauce" }
+You can provide your own user data in:
+```bash
+cypress.env.json
 ```
-- in CI (optional): GitHub Secrets `CYPRESS_USER_NAME`, `CYPRESS_USER_PASS`
-
-The `cy.login` helper falls back to the defaults above, so CI works even without secrets.
-
-## Project structure
-```
-cypress/
-  e2e/
-    accessibility-smoke.cy.js
-    auth-login.cy.js
-    auth-logout.cy.js
-    catalog-sorting.cy.js
-    checkout-happy-path.cy.js
-    checkout-validation.cy.js
-    quality-a11y.cy.js
-    quality-visual.cy.js     # placeholder/pending
-    saucedemo-auth.cy.js
-    saucedemo-cart-checkout.cy.js
-  support/
-    e2e.js        # imports cypress-axe + ./commands
-    commands.js   # cy.login, cy.logout, cy.ensureOnInventory, cy.openCart, cy.addAnyItem
-.github/workflows/
-  cypress-matrix.yml
-```
-
-## Scripts
+Example:
 ```json
 {
-  "scripts": {
-    "open": "cypress open",
-    "test": "cypress run --headless --browser electron --reporter junit --reporter-options mochaFile=results/junit-[hash].xml,toConsole=true"
-  },
-  "devDependencies": {
-    "cypress-axe": "^1.5.0"
-  }
+  "USER_NAME": "your_user_here",
+  "USER_PASS": "your_password_here"
 }
 ```
+or set environment variables (locally / in CI):
+```bash
+CYPRESS_USER_NAME=your_user
+CYPRESS_USER_PASS=your_password
+```
 
-## A11y policy
-- Smoke on key pages.
-- Validate **`critical`** impact only.
-- On the inventory page, disable Axe rule **`select-name`** (known false positive for the sorting `<select>`).
-- Call order: **`cy.injectAxe()` before `cy.configureAxe()`**, then `cy.checkA11y(...)`.
+The `cy.login()` command reads these values automatically.
 
-## CI
-Workflow `.github/workflows/cypress-matrix.yml`:
-- installs deps (`npm ci`)
-- runs `npx cypress run` for `electron` and `chrome`
-- uploads JUnit XML as an artifact (`results/`)
+---
 
-## Troubleshooting
-- **404 after `cy.visit('/inventory.html')`** → route is protected; use helpers (`cy.ensureOnInventory()`, `cy.openCart()`).
-- **Axe: TypeError with `configureAxe`** → make sure `cy.injectAxe()` is called **before** `cy.configureAxe(...)`.
-- **No secrets in forks** → helper has a fallback; tests run without secrets.
+## Project Structure
+```
+cypress/
+  e2e/                # All E2E test specs
+  support/
+    commands.js       # Custom Cypress commands (login, logout, ensureOnInventory, etc.)
+    selectors.js      # Centralized selectors map
+  fixtures/
+    users.json        # Example data
+results/
+  junit-[hash].xml    # Test reports for CI
+```
 
-## License
-Demo tests for educational purposes.
+---
+
+## Highlights & Good Practices
+
+- **Custom commands:** Encapsulated flows (`cy.login`, `cy.logout`, etc.) to keep specs readable.
+- **Centralized selectors:** All UI locators defined in `support/selectors.js` — no hard-coded selectors in tests.
+- **Layered coverage:** Functional, regression, and accessibility checks in the same framework.
+- **Continuous Integration:** Ready to run in GitHub Actions with JUnit output.
+- **Clear reporting:** Console + XML output for visibility in pipelines.
+
+---
+
+## Example Scenarios
+
+| Area | Test | Description |
+|------|------|-------------|
+| **Auth** | Login / Logout | Validates both happy path and negative user states |
+| **Catalog** | Sorting | Confirms “low → high” pricing works numerically |
+| **Checkout** | Validation | Verifies required fields block progression |
+| **Accessibility** | A11y Smoke | Runs axe-core against key flows |
+| **Visual** | Optional baseline | Placeholder for future visual regression |
+
+---
+
+## Why This Repo
+
+This repository is intended as a **portfolio piece** — to show:
+- how I design a test framework from scratch,
+- how I structure reusable components,
+- how I document and communicate testing intent,
+- and how I integrate with CI for automated quality gates.
+
+It’s not just about testing *SauceDemo* — it’s about demonstrating **real-world E2E engineering practices**.
