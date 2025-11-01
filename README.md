@@ -6,11 +6,11 @@ Comprehensive **end-to-end test automation framework** built with [Cypress](http
 - accessibility and regression checks,
 - CI/CD integration with GitHub Actions.
 
-> This project demonstrates my approach to building maintainable, production-ready E2E suites — not just “tests that click”.
+> 💡 This project demonstrates my approach to building maintainable, production-ready E2E suites — not just “tests that click”.
 
 ---
 
-## Tech Stack
+## 🔧 Tech Stack
 - **Cypress 13.x**
 - **Node 20.x**
 - **cypress-axe** – accessibility testing
@@ -20,7 +20,7 @@ Comprehensive **end-to-end test automation framework** built with [Cypress](http
 
 ---
 
-## Running the Tests
+## 🚀 Running the Tests
 
 ### Local Run
 ```bash
@@ -53,7 +53,7 @@ The `cy.login()` command reads these values automatically.
 
 ---
 
-## Project Structure
+## 🧱 Project Structure
 ```
 cypress/
   e2e/                # All E2E test specs
@@ -68,7 +68,7 @@ results/
 
 ---
 
-## Highlights & Good Practices
+## 🧩 Highlights & Good Practices
 
 - **Custom commands:** Encapsulated flows (`cy.login`, `cy.logout`, etc.) to keep specs readable.
 - **Centralized selectors:** All UI locators defined in `support/selectors.js` — no hard-coded selectors in tests.
@@ -78,7 +78,7 @@ results/
 
 ---
 
-## Example Scenarios
+## ✅ Example Scenarios
 
 | Area | Test | Description |
 |------|------|-------------|
@@ -90,7 +90,7 @@ results/
 
 ---
 
-## Why This Repo
+## 🧠 Why This Repo
 
 This repository is intended as a **portfolio piece** — to show:
 - how I design a test framework from scratch,
@@ -99,3 +99,9 @@ This repository is intended as a **portfolio piece** — to show:
 - and how I integrate with CI for automated quality gates.
 
 It’s not just about testing *SauceDemo* — it’s about demonstrating **real-world E2E engineering practices**.
+
+---
+
+## 📄 License
+
+MIT – free to use and adapt for demonstration or interview purposes.
