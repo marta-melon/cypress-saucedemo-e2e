@@ -38,6 +38,14 @@ End‑to‑end tests for the **SauceDemo** storefront (https://www.saucedemo.com
   Expected: items sorted by ascending price.
 
 ### 6.3 Cart & Purchase
+- **Cart – multiple items** → `cart-behavior.cy.js`  
+  Expected: after adding 3 products, all appear in `/cart.html` with correct titles.
+- **Cart – remove item (cart view)** → `cart-behavior.cy.js`  
+  Expected: removed item no longer listed in the cart.
+- **Cart – remove item (product page)** → `cart-behavior.cy.js`  
+  Steps: add on inventory → open product detail → remove; button reverts to “Add to cart” on return.
+- **Cart – price consistency** → `cart-behavior.cy.js`  
+  Expected: price on inventory card equals price shown in the cart for the same item.
 - **Checkout – happy path** → `checkout-happy-path.cy.js` and `saucedemo-cart-checkout.cy.js`  
   Steps: add an item → open cart → checkout step one → fill details → finish.  
   Expected: `checkout-complete.html` with “Thank you for your order!”.
