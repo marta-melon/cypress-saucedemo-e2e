@@ -1,30 +1,40 @@
-name: E2E
-true:
-- push
-- pull_request
-jobs:
-  run:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install deps
-      run: npm ci
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - run: npm install
-    - run: npm test
-    - uses: actions/upload-artifact@v4
-      with:
-        name: results
-        path: results
-    - name: Run Cypress tests
-      env:
-        CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
-        CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
-      run: npm test
-'on':
+name: Cypress E2E Tests
+
+on:
   push:
-    branches:
-    - main
-  pull_request: null
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Cypress
+        run: npx cypress verify
+
+      - name: Run Cypress tests
+        env:
+          CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
+          CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
+        run: npx cypress run --browser chrome --headless --reporter junit --reporter-options "mochaFile=results/junit-[hash].xml"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: results
+          if-no-files-found: ignore
