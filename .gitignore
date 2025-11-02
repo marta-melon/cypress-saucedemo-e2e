@@ -15,6 +15,7 @@ cypress/screenshots/
 cypress/videos/
 results/
 cypress/reports/
+cypress.env.json
 
 # Env / secrets
 .env

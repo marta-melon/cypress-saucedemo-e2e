@@ -1,13 +1,30 @@
 name: E2E
-on: [push, pull_request]
+true:
+- push
+- pull_request
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: npm install
-      - run: npm test
-      - uses: actions/upload-artifact@v4
-        with: { name: results, path: results }
+    - name: Install deps
+      run: npm ci
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - run: npm install
+    - run: npm test
+    - uses: actions/upload-artifact@v4
+      with:
+        name: results
+        path: results
+    - name: Run Cypress tests
+      env:
+        CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
+        CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
+      run: npm test
+'on':
+  push:
+    branches:
+    - main
+  pull_request: null
