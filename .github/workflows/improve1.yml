@@ -1,28 +1,34 @@
 name: cypress-e2e
-true:
-  push: null
-  pull_request: null
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 18
-        cache: npm
-    - run: npm ci
-    - name: Run Cypress (headless)
-      run: npm test
-      env:
-        BOOKER_BASE_URL: ${{ secrets.BOOKER_BASE_URL }}
-    - name: Run Cypress tests
-      env:
-        CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
-        CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
-      run: npm test
-'on':
-  push:
-    branches:
-    - main
-  pull_request: null
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run Cypress (headless)
+        env:
+          CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
+          CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
+        run: npm test
+
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: results
+          if-no-files-found: ignore
