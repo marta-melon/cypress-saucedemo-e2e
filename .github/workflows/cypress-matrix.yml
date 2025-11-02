@@ -1,47 +1,50 @@
 name: cypress-matrix
-true:
+
+on:
   push:
-    branches:
-    - main
-  pull_request: null
+    branches: [ main ]
+  pull_request:
+
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        browser:
-        - electron
-        - chrome
+        browser: [electron, chrome]
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - name: Install deps
-      run: npm ci
-    - name: Verify Cypress
-      run: npx cypress verify
-    - name: Run Cypress
-      run: npx cypress run --browser ${{ matrix.browser }} --headless --reporter junit
-        --reporter-options mochaFile=results/junit-[hash].xml
-    - name: Upload JUnit results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: results-${{ matrix.browser }}
-        path: results
-        if-no-files-found: ignore
-    - name: Run Cypress tests
-      env:
-        CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
-        CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
-      run: npm test
-'on':
-  push:
-    branches:
-    - main
-  pull_request: null
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Verify Cypress
+        run: npx cypress verify
+
+      - name: Run Cypress
+        env:
+          CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
+          CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
+        run: >
+          npx cypress run
+          --browser ${{ matrix.browser }}
+          --headless
+          --reporter junit
+          --reporter-options "mochaFile=results/junit-[hash].xml,toConsole=true"
+
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.browser }}
+          path: results
+          if-no-files-found: ignore
