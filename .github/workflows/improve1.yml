@@ -23,6 +23,8 @@ jobs:
         env:
           CYPRESS_USER_NAME: ${{ secrets.CYPRESS_USER_NAME }}
           CYPRESS_USER_PASS: ${{ secrets.CYPRESS_USER_PASS }}
+          CYPRESS_LOCKED_USER_NAME: ${{ secrets.CYPRESS_LOCKED_USER_NAME }}
+          CYPRESS_LOCKED_USER_PASS: ${{ secrets.CYPRESS_LOCKED_USER_PASS }}
         run: npm test
 
       - name: Upload JUnit results
