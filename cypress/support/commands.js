@@ -1,6 +1,3 @@
-// cypress/support/commands.js
-// Note: keep your imports at the top so custom commands have access to shared helpers.
-import 'cypress-axe';
 import { Sel } from './selectors.js';
 
 /**
@@ -8,7 +5,7 @@ import { Sel } from './selectors.js';
  *
  * Priority of credentials:
  * 1) Explicit function arguments (username, password)
- * 2) Cypress.env('USER_NAME' | 'USER_PASS')  // auto-exposed from env vars prefixed with CYPRESS_
+ * 2) Cypress.env('USER_NAME' | 'USER_PASS') // auto-exposed from env vars prefixed with CYPRESS_
  * 3) Cypress.env('CYPRESS_USER_NAME' | 'CYPRESS_USER_PASS')  // direct read just in case
  * 4) Safe defaults for local runs (Swag Labs demo creds)
  *
@@ -28,15 +25,12 @@ Cypress.Commands.add('login', (username = null, password = null) => {
     Cypress.env('CYPRESS_USER_PASS') ||
     'secret_sauce';
 
-  // Visit the base URL (must be configured in cypress.config.*)
   cy.visit('/');
 
-  // Fill credentials and submit
   cy.get(Sel.login.username, { timeout: 15000 }).clear().type(user);
-  cy.get(Sel.login.password).clear().type(pass, { log: false }); // don't print secrets to logs
-  cy.get(Sel.login.submit).click();
+  cy.get(Sel.login.password).clear().type(pass, { log: false });
+  cy.get(Sel.login.button).click();
 
-  // Quick sanity check that we actually landed on the inventory page
   cy.url().should('include', '/inventory.html');
 });
 
@@ -45,8 +39,8 @@ Cypress.Commands.add('login', (username = null, password = null) => {
  * We compare against an exact URL resolved from baseUrl to avoid flakiness.
  */
 Cypress.Commands.add('logout', () => {
-  cy.get(Sel.burger.menuBtn).click();
-  cy.get(Sel.burger.logout).should('be.visible').click();
+  cy.get(Sel.menu.button).click();
+  cy.get(Sel.menu.logout).should('be.visible').click();
 
   const base = Cypress.config('baseUrl');
   expect(base, 'Set baseUrl in cypress.config.*').to.be.a('string').and.not.be.empty;
@@ -54,6 +48,27 @@ Cypress.Commands.add('logout', () => {
 
   cy.url().should('eq', expectedLoginUrl);
 });
+
+/**
+ * Get credentials for user that is locked out
+ * Priority of credentials:
+ * 1) Cypress.env('USER_NAME' | 'USER_PASS') // auto-exposed from env vars prefixed with CYPRESS_
+ * 2) Cypress.env('CYPRESS_USER_NAME' | 'CYPRESS_USER_PASS')  // direct read just in case
+ * 3) Safe defaults for local runs (Swag Labs demo creds)
+ */
+Cypress.Commands.add('getLockedOutUser', () => {
+  const user =
+    Cypress.env('LOCKED_USER_NAME') ||
+    Cypress.env('CYPRESS_LOCKED_USER_NAME');
+
+  const pass =
+    Cypress.env('LOCKED_USER_PASS') ||
+    Cypress.env('CYPRESS_LOCKED_USER_PASS');
+
+  const creds = { user: user, password: pass };
+
+  return cy.wrap(creds);
+})
 
 /**
  * Ensure we are on the Inventory page.
@@ -65,8 +80,12 @@ Cypress.Commands.add('ensureOnInventory', () => {
       cy.login();
     }
   });
-  cy.url().should('include', '/inventory.html');
-  cy.contains('.title', 'Products').should('be.visible');
+
+  cy.url()
+    .should('include', '/inventory.html');
+
+  cy.contains('.title', 'Products')
+    .should('be.visible');
 });
 
 /**
@@ -74,15 +93,21 @@ Cypress.Commands.add('ensureOnInventory', () => {
  * This is intentionally simple and not tied to a specific product name.
  */
 Cypress.Commands.add('addAnyItem', () => {
-  cy.get(Sel.inventory.item).first().within(() => {
-    cy.contains('button', 'Add to cart').click();
-  });
+  cy.get(Sel.inventory.item)
+    .first()
+    .within(() => {
+      cy.contains('button', 'Add to cart')
+        .click();
+    });
 });
 
 /**
  * Open the cart page from the header icon and verify the URL.
  */
 Cypress.Commands.add('openCart', () => {
-  cy.get(Sel.inventory.cartIcon).click();
-  cy.url().should('include', '/cart.html');
+  cy.get(Sel.inventory.cartIcon)
+    .click();
+
+  cy.url()
+    .should('include', '/cart.html');
 });
