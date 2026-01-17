@@ -12,8 +12,6 @@ pnpm-debug.log*
 
 # Cypress
 cypress/screenshots/
-cypress/snapshots/
-cypress/downloads/
 cypress/videos/
 results/
 cypress/reports/
