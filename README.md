@@ -1,107 +1,76 @@
-# Cypress E2E Framework – SauceDemo Example
+# Cypress E2E – SauceDemo
 
-Comprehensive **end-to-end test automation framework** built with [Cypress](https://www.cypress.io/), showcasing:
-- modular test design,
-- clean selector management,
-- accessibility and regression checks,
-- CI/CD integration with GitHub Actions.
+End-to-end test automation project built with Cypress.
+The repository presents a realistic E2E setup focused on maintainability, readability, and CI execution rather than demo-only examples.
 
-> 💡 This project demonstrates my approach to building maintainable, production-ready E2E suites — not just “tests that click”.
+The framework is intentionally kept simple, but structured in a way that scales with growing test coverage.
 
----
+## Tech Stack
+- Cypress 13.x
+- Node.js 20.x
+- Mocha + Chai
+- cypress-axe (accessibility checks)
+- GitHub Actions
+- JUnit reporter
 
-## 🔧 Tech Stack
-- **Cypress 13.x**
-- **Node 20.x**
-- **cypress-axe** – accessibility testing
-- **Mocha + Chai** – assertions
-- **GitHub Actions** – CI matrix (Electron / Chrome)
-- **JUnit reporter** – machine-readable results for pipelines
-
----
-
-## 🚀 Running the Tests
-
-### Local Run
+## Installation
 ```bash
-npm ci          # install dependencies
-npm test        # headless run (Electron) + JUnit report
-npm run open    # open Cypress runner (interactive)
+npm ci
 ```
 
-### Credentials
-For security reasons, test credentials are not stored in this repository.
+## Running Tests
 
-You can provide your own user data in:
+### Headless (default)
 ```bash
-cypress.env.json
+npm test
 ```
-Example:
-```json
-{
-  "USER_NAME": "your_user_here",
-  "USER_PASS": "your_password_here"
-}
-```
-or set environment variables (locally / in CI):
+
+### Interactive
 ```bash
-CYPRESS_USER_NAME=your_user
-CYPRESS_USER_PASS=your_password
+npm run open
 ```
 
-The `cy.login()` command reads these values automatically.
+## Configuration and Credentials
+Sensitive data is not stored in the repository.
 
----
+Credentials must be provided via environment variables (locally or in CI):
+```bash
+CYPRESS_USER_NAME=standard_user
+CYPRESS_USER_PASS=secret_sauce
+```
 
-## 🧱 Project Structure
+Cypress automatically exposes variables prefixed with `CYPRESS_`.
+Authentication is handled through custom commands (for example `cy.login()`), so test specs remain clean.
+
+## Project Structure
 ```
 cypress/
-  e2e/                # All E2E test specs
+  e2e/                 # Test specifications
   support/
-    commands.js       # Custom Cypress commands (login, logout, ensureOnInventory, etc.)
-    selectors.js      # Centralized selectors map
-  fixtures/
-    users.json        # Example data
+    commands.js        # Custom Cypress commands
+    selectors.js       # Centralized UI selectors
 results/
-  junit-[hash].xml    # Test reports for CI
+  junit-*.xml          # CI test reports
 ```
 
----
+## Test Coverage
+The framework focuses on core user paths:
+- authentication and authorization scenarios,
+- product listing and sorting logic,
+- cart operations,
+- checkout validation,
+- logout flow,
+- basic accessibility smoke checks.
 
-## 🧩 Highlights & Good Practices
+Negative scenarios (for example locked users or invalid states) are covered where relevant.
 
-- **Custom commands:** Encapsulated flows (`cy.login`, `cy.logout`, etc.) to keep specs readable.
-- **Centralized selectors:** All UI locators defined in `support/selectors.js` — no hard-coded selectors in tests.
-- **Layered coverage:** Functional, regression, and accessibility checks in the same framework.
-- **Continuous Integration:** Ready to run in GitHub Actions with JUnit output.
-- **Clear reporting:** Console + XML output for visibility in pipelines.
+## CI Integration
+Tests are executed automatically in GitHub Actions on push and pull request events.
+Workflows support running tests in different browsers (Electron / Chrome).
+JUnit reports are generated to allow integration with CI tools and quality gates.
 
----
-
-## ✅ Example Scenarios
-
-| Area | Test | Description |
-|------|------|-------------|
-| **Auth** | Login / Logout | Validates both happy path and negative user states |
-| **Catalog** | Sorting | Confirms “low → high” pricing works numerically |
-| **Checkout** | Validation | Verifies required fields block progression |
-| **Accessibility** | A11y Smoke | Runs axe-core against key flows |
-| **Visual** | Optional baseline | Placeholder for future visual regression |
-
----
-
-## 🧠 Why This Repo
-
-This repository is intended as a **portfolio piece** — to show:
-- how I design a test framework from scratch,
-- how I structure reusable components,
-- how I document and communicate testing intent,
-- and how I integrate with CI for automated quality gates.
-
-It’s not just about testing *SauceDemo* — it’s about demonstrating **real-world E2E engineering practices**.
-
----
-
-## 📄 License
-
-MIT – free to use and adapt for demonstration or interview purposes.
+## Design Decisions
+- Custom commands are used to encapsulate repeated flows.
+- Selectors are centralized to reduce maintenance cost.
+- Tests avoid implementation details where possible and focus on user behavior.
+- No hard dependency on external services beyond the demo application.
